@@ -6,21 +6,22 @@ import Image from "next/image";
 import Scan from '../containers/Scan';
 import Write from '../containers/Write';
 import { useState } from 'react';
-import { ActionsContext } from '../contexts/context';
+import { Actions, ActionsContext } from '../contexts/context';
 import './App.css';
 
-type Actions = {
-    scan?: () => void;
-    write?: () => void;
-} | null;
+// type Actions = {
+//     scan?: () => void;
+//     write?: () => void;
+// } | null;
 
 export default function Home() {
-    const [actions, setActions] = useState<Actions>(null);
+    // const [actions, setActions] = useState<Actions>(null);
+    const [actions, setActions] = useState(null);
     const { scan, write } = actions || {};
 
     const actionsValue = { actions, setActions };
 
-    const onHandleAction = (actions: any) => {
+    const onHandleAction = (actions) => {
         setActions({ ...actions });
     }
     return (
@@ -33,8 +34,8 @@ export default function Home() {
                     <button onClick={() => onHandleAction({ scan: null, write: 'writing' })} className="btn">Write</button>
                 </div>
                 <ActionsContext.Provider value={actionsValue}>
-                    {scan && <Scan />}
-                    {write && <Write />}
+                    {scan !== null && scan && <Scan />}
+                    {write !== null && write && <Write />}
                 </ActionsContext.Provider>
             </div>
             <footer className="p-4 bg-blue-700 text-white">
