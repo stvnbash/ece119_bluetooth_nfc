@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ */
+
 'use client'
 
 import Image from "next/image";
