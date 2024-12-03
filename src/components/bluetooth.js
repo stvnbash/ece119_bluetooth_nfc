@@ -6,13 +6,14 @@ const Bluetooth = ({ bleDeviceName, bleSecret, hostName, bluetoothstatusupdate }
     const [connectionStatus, setConnectionStatus] = useState('Not connected');
     const [device, setDevice] = useState(null);
     const [gattServer, setGattServer] = useState(null);
+    const [receivedData, setReceivedData] = useState([]);
 
     const connectToBluetoothDevice = async () => {
         try {
             // Request Bluetooth device based on device name
             const device = await navigator.bluetooth.requestDevice({
                 filters: [{ name: bleDeviceName }],
-                optionalServices: ['0000aaaa-0000-1000-8000-00805f9b34fb'], // Optional UUID for service (replace with actual UUID)
+                optionalServices: ['0000aaaa-0000-1000-8000-00805f9b34fb', '0000acce-0000-1000-8000-00805f9b34fb'], // Optional UUID for service (replace with actual UUID)
             });
 
             setDevice(device);
@@ -24,8 +25,8 @@ const Bluetooth = ({ bleDeviceName, bleSecret, hostName, bluetoothstatusupdate }
 
             // Get the service and characteristic
             // const service = await server.getPrimaryService('0000EEEE-0000-1000-8000-00805f9b34fb'); // Replace with the correct UUID
-            const service = await gattServer.getPrimaryService('0000aaaa-0000-1000-8000-00805f9b34fb'); // Replace with the correct UUID
-            const characteristic = await service.getCharacteristic('0000eeee-0000-1000-8000-00805f9b34fb'); // Replace with the correct characteristic UUID
+            const serviceAuth = await gattServer.getPrimaryService('0000aaaa-0000-1000-8000-00805f9b34fb'); // Replace with the correct UUID
+            const characteristicAuth = await serviceAuth.getCharacteristic('0000eeee-0000-1000-8000-00805f9b34fb'); // Replace with the correct characteristic UUID
 
             // Prepare message
             const message = `${bleSecret}:${hostName}`;
@@ -33,10 +34,22 @@ const Bluetooth = ({ bleDeviceName, bleSecret, hostName, bluetoothstatusupdate }
             const messageBuffer = encoder.encode(message);
 
             // Send message to the characteristic
-            await characteristic.writeValue(messageBuffer);
-            console.log("sent to characteristic:", messageBuffer)
+            await characteristicAuth.writeValue(messageBuffer);
+            console.log("sent to characteristicAuth:", messageBuffer)
 
-            setConnectionStatus('Connected and message sent');
+            setConnectionStatus('Connected and message sent to characteristicAuth');
+
+            // Get the service and characteristic for notifications
+            const serviceIMU = await gattServer.getPrimaryService('0000acce-0000-1000-8000-00805f9b34fb'); // Replace with the correct UUID
+            const characteristicIMU = await serviceIMU.getCharacteristic('000010a1-0000-1000-8000-00805f9b34fb'); // Replace with the correct UUID
+
+            // Enable notifications
+            await characteristicIMU.startNotifications();
+            setConnectionStatus('Listening for notifications from characteristic IMU');
+
+            // Add event listener for characteristic value changes
+            characteristicIMU.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
+
         } catch (error) {
             console.error('Error connecting to Bluetooth device:', error);
             setConnectionStatus(`Connection failed: ${error}`);
@@ -75,6 +88,22 @@ const Bluetooth = ({ bleDeviceName, bleSecret, hostName, bluetoothstatusupdate }
         }
     };
 
+    const handleCharacteristicValueChanged = (event) => {
+
+        const value = event.target.value;
+        // const decoder = new TextDecoder();
+        // const data = decoder.decode(value);
+
+        // Log the raw bytes to inspect:
+        // console.log('Raw data:', Array.from(new Uint8Array(value.buffer)));
+
+        const dataView = new DataView(value.buffer); // Create a DataView for parsing
+        const floatValue = dataView.getFloat32(0, true); // Read the float value (little-endian)
+
+        // Append the new data to the receivedData array
+        // setReceivedData((prevData) => [...prevData, data]);
+        setReceivedData((prevData) => [...prevData, `Ax: ${floatValue}`]);
+    };
 
     // Use effect to handle initial connection attempt on mount
     useEffect(() => {
@@ -101,6 +130,17 @@ const Bluetooth = ({ bleDeviceName, bleSecret, hostName, bluetoothstatusupdate }
                         <button onClick={() => sendMessageToCharacteristic(gattServer, 1)} className='btn'>No New Devices</button>
                         <button onClick={() => sendMessageToCharacteristic(gattServer, 0)} className='btn'>Allow New Devices</button>
                         <button onClick={() => { bluetoothstatusupdate(false); }} className='btn'>cancel</button>
+                    </div>
+                    <div>
+                        <h3 className="text-2xl pt-4">Received Data</h3>
+                        <textarea
+                            rows="10"
+                            cols="50"
+                            readOnly
+                            // value={receivedData.join('\n')}
+                            value={receivedData.slice().reverse().join('\n')} // Reverse the list for rendering
+                            style={{ resize: 'none' }}
+                        ></textarea>
                     </div>
                 </>
             )}
