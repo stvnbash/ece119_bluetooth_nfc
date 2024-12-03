@@ -43,7 +43,7 @@ const Scan = ({messageWriter}) => {
                 case "text":
                     const textDecoder = new TextDecoder(record.encoding);
                     setMessage(textDecoder.decode(record.data));
-                    messageWriter(message);
+                    messageWriter(textDecoder.decode(record.data));
 
                     // add logic to initiate bluetooth connection
                     if (message === secret_key) {

@@ -42,15 +42,15 @@ export default function Home() {
                     <h3 className="text-2xl font-bold pt-8">Bluetooth</h3>
                     <div className="flex flex-row">
                         <p>Local Device name:</p>
-                        <input type="text" value={deviceName} onChange={(e) => setDeviceName(e.target.value)}></input>
+                        <input className="text-black" type="text" value={deviceName} onChange={(e) => setDeviceName(e.target.value)}></input>
                     </div>
                     <div className="flex flex-row">
                         <p>Bluetooth device to connect to:</p>
-                        <input type="text" value={bleDevice} onChange={(e) => setBleDevice(e.target.value)}></input>
+                        <input className="text-black" type="text" value={bleDevice} onChange={(e) => setBleDevice(e.target.value)}></input>
                     </div>
                     <div className="flex flex-row">
                         <p>NFC Message:</p>
-                        <input type="text" value={nfcMessage} readOnly></input>
+                        <input className="text-black" type="text" value={nfcMessage} readOnly></input>
                     </div>
                     <button className="btn">Bluetooth</button>
                 </div>
