@@ -19,6 +19,9 @@ const Bluetooth = ({ bleDeviceName, bleSecret, hostName, bluetoothstatusupdate }
             setDevice(device);
             setConnectionStatus('Connecting...');
 
+             // Listen for disconnection
+             device.addEventListener('gattserverdisconnected', handleDeviceDisconnected);
+
             // Connect to the device
             const gattServer = await device.gatt.connect();
             setGattServer(gattServer);
@@ -64,6 +67,14 @@ const Bluetooth = ({ bleDeviceName, bleSecret, hostName, bluetoothstatusupdate }
             setConnectionStatus('Disconnected');
             bluetoothstatusupdate(false);
         }
+    };
+
+    const handleDeviceDisconnected = () => {
+        console.log('Device disconnected');
+        setDevice(null);
+        setGattServer(null);
+        setConnectionStatus('Disconnected');
+        bluetoothstatusupdate(false);
     };
 
     const sendMessageToCharacteristic = async (gattServer, value) => {
@@ -129,7 +140,7 @@ const Bluetooth = ({ bleDeviceName, bleSecret, hostName, bluetoothstatusupdate }
                         <button onClick={disconnectFromBluetoothDevice} className='btn'>Disconnect</button>
                         <button onClick={() => sendMessageToCharacteristic(gattServer, 1)} className='btn'>No New Devices</button>
                         <button onClick={() => sendMessageToCharacteristic(gattServer, 0)} className='btn'>Allow New Devices</button>
-                        <button onClick={() => { bluetoothstatusupdate(false); }} className='btn'>cancel</button>
+                        {/* <button onClick={() => { bluetoothstatusupdate(false); }} className='btn'>cancel</button> */}
                     </div>
                     <div>
                         <h3 className="text-2xl pt-4">Received Data</h3>
