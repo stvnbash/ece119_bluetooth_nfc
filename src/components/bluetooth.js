@@ -133,7 +133,7 @@ const Bluetooth = ({ bleDeviceName, bleSecret, hostName, bluetoothstatusupdate }
                     </div>
                     <div>
                         <h3 className="text-2xl pt-4">Received Data</h3>
-                        <textarea
+                        <textarea className="text-black"
                             rows="10"
                             cols="50"
                             readOnly

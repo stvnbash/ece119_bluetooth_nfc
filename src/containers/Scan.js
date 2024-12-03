@@ -68,8 +68,8 @@ const Scan = ({messageWriter}) => {
         <>
             {actions.scan === 'scanned' ?
                 <div>
-                    <p>Serial Number: {serialNumber}</p>
-                    <p>Message: {message}</p>
+                    {/* <p>Serial Number: {serialNumber}</p>
+                    <p>Message: {message}</p> */}
                 </div>
                 : <Scanner status={actions.scan}></Scanner>}
         </>

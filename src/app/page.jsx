@@ -58,7 +58,7 @@ export default function Home() {
                 <h1 className="text-4xl font-bold pt-8 text-yellow-500">Touch Secure BLE</h1>
                 <div className="App-container">
                     <button onClick={() => onHandleAction({ scan: 'scanning', write: null })} className="btn">Scan</button>
-                    <button onClick={() => onHandleAction({ scan: null, write: 'writing' })} className="btn">Write</button>
+                    {/* <button onClick={() => onHandleAction({ scan: null, write: 'writing' })} className="btn">Write</button> */}
                 </div>
                 <div className="flex flex-col gap-4">
                     <h3 className="text-2xl font-bold pt-8">Bluetooth</h3>
