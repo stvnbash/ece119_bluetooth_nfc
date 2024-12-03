@@ -53,6 +53,29 @@ const Bluetooth = ({ bleDeviceName, bleSecret, hostName, bluetoothstatusupdate }
         }
     };
 
+    const sendMessageToCharacteristic = async (gattServer, value) => {
+        try {
+            // Ensure the value is either 0 or 1
+            if (value !== 0 && value !== 1) {
+                throw new Error('Value must be 0 or 1');
+            }
+
+            // Get the service and characteristic
+            const service = await gattServer.getPrimaryService('0000aaaa-0000-1000-8000-00805f9b34fb'); // Replace with the correct service UUID
+            const characteristic = await service.getCharacteristic('0000ffff-0000-1000-8000-00805f9b34fb'); // Replace with the correct characteristic UUID
+
+            // Prepare the message as a Uint8Array (0 or 1)
+            const messageBuffer = new Uint8Array([value]);
+
+            // Write the value to the characteristic
+            await characteristic.writeValue(messageBuffer);
+            console.log(`Message sent: ${value}`);
+        } catch (error) {
+            console.error('Error sending message to characteristic:', error);
+        }
+    };
+
+
     // Use effect to handle initial connection attempt on mount
     useEffect(() => {
         if (bleDeviceName) {
@@ -66,16 +89,21 @@ const Bluetooth = ({ bleDeviceName, bleSecret, hostName, bluetoothstatusupdate }
             {!device && (
                 <>
                     <p>{connectionStatus}</p>
+                    <button onClick={() => { bluetoothstatusupdate(false); }} className='btn'>cancel</button>
                 </>
             )
             }
             {device && (
                 <>
                     <p>Connected to device: {device.name}</p>
-                    <button onClick={disconnectFromBluetoothDevice} className='btn'>Disconnect</button>
+                    <div className='flex'>
+                        <button onClick={disconnectFromBluetoothDevice} className='btn'>Disconnect</button>
+                        <button onClick={() => sendMessageToCharacteristic(gattServer, 1)} className='btn'>No New Devices</button>
+                        <button onClick={() => sendMessageToCharacteristic(gattServer, 0)} className='btn'>Allow New Devices</button>
+                        <button onClick={() => { bluetoothstatusupdate(false); }} className='btn'>cancel</button>
+                    </div>
                 </>
             )}
-            <button onClick={() => { bluetoothstatusupdate(false); }} className='btn'>cancel</button>
             {/* {device && <p>Connected to device: {device.name}</p>} */}
             {/* <p>bleDeviceName: {bleDeviceName}</p>
       <p>bleSecret: {bleSecret}</p>
