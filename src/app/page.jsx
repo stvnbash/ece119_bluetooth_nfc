@@ -67,7 +67,7 @@ export default function Home() {
                         <input className="text-black" type="text" value={deviceName} onChange={(e) => setDeviceName(e.target.value)}></input>
                     </div>
                     {/* <button onClick={handleMessageUpdate('{"id":4b7b0, "device": "SecureBLE"}')}>set nfc message - temp for dev</button> */}
-                    <button className="btn" onClick={() => handleMessageUpdate('{"id":"4b7b0", "device": "SecureBLE"}')}>Update NFC Message (dev)</button>
+                    <button className="btn" onClick={() => handleMessageUpdate('{"id":"c86d0", "device": "SecureBLE"}')}>Update NFC Message (dev)</button>
                     <div className="flex flex-row">
                         <p>NFC Message:</p>
                         <input className="text-black" type="text" value={nfcMessage} readOnly></input>
@@ -80,7 +80,7 @@ export default function Home() {
                     </div> */}
                     {!bluetoothConnection && <button className="btn" onClick={() => setBluetoothConnection(true)}>Bluetooth</button>}
                     {/* {bluetoothConnection && <button className="btn" onClick={() => setBluetoothConnection(false)}>Disconnect Bluetooth</button>} */}
-                    {bluetoothConnection && <Bluetooth bleDeviceName={bleDevice} bleSecret={bleSecretId} hostName={deviceName}/>}
+                    {bluetoothConnection && <Bluetooth bleDeviceName={bleDevice} bleSecret={bleSecretId} hostName={deviceName} bluetoothstatusupdate={setBluetoothConnection}/>}
                 </div>
                 <ActionsContext.Provider value={actionsValue}>
                     {scan !== null && scan && <Scan messageWriter={handleMessageUpdate} />}
